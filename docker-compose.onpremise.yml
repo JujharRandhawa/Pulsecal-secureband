@@ -1,0 +1,231 @@
+version: '3.8'
+
+# PulseCal SecureBand - On-Premise Jail Deployment
+# Internal networking only, no public ports exposed
+
+services:
+  # PostgreSQL with TimescaleDB
+  postgres:
+    image: timescale/timescaledb:latest-pg16
+    container_name: pulsecal-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_DATABASE:-pulsecal_secureband}
+      POSTGRES_USER: ${DB_USERNAME:-pulsecal}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-CHANGE_ME_IN_PRODUCTION}
+      POSTGRES_INITDB_ARGS: "-E UTF8 --locale=C"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      - ./database/auth_schema.sql:/docker-entrypoint-initdb.d/02-auth-schema.sql:ro
+      - ./database/retention_policies.sql:/docker-entrypoint-initdb.d/03-retention-policies.sql:ro
+      - ./backups:/backups:rw
+    networks:
+      - pulsecal-internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-pulsecal} -d ${DB_DATABASE:-pulsecal_secureband}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    # No ports exposed - internal network only
+
+  # Redis (for caching and sessions)
+  redis:
+    image: redis:7-alpine
+    container_name: pulsecal-redis
+    restart: unless-stopped
+    command: redis-server --requirepass ${REDIS_PASSWORD:-CHANGE_ME_IN_PRODUCTION} --appendonly yes
+    volumes:
+      - redis_data:/data
+    networks:
+      - pulsecal-internal
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    # No ports exposed - internal network only
+
+  # RabbitMQ (Event Bus)
+  rabbitmq:
+    image: rabbitmq:3.12-management-alpine
+    container_name: pulsecal-rabbitmq
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-pulsecal}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-CHANGE_ME_IN_PRODUCTION}
+      RABBITMQ_DEFAULT_VHOST: ${RABBITMQ_VHOST:-pulsecal}
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - pulsecal-internal
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    # No ports exposed - internal network only
+
+  # Backend API (NestJS)
+  api:
+    build:
+      context: .
+      dockerfile: packages/api/Dockerfile
+    container_name: pulsecal-api
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USERNAME: ${DB_USERNAME:-pulsecal}
+      DB_PASSWORD: ${DB_PASSWORD:-CHANGE_ME_IN_PRODUCTION}
+      DB_DATABASE: ${DB_DATABASE:-pulsecal_secureband}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-CHANGE_ME_IN_PRODUCTION}
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USER: ${RABBITMQ_USER:-pulsecal}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:-CHANGE_ME_IN_PRODUCTION}
+      RABBITMQ_VHOST: ${RABBITMQ_VHOST:-pulsecal}
+      CORS_ORIGIN: http://web:3000
+      AUTH_ALLOWED_IP_RANGES: ${AUTH_ALLOWED_IP_RANGES:-10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,127.0.0.1/32}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - pulsecal-internal
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    # No ports exposed - internal network only
+
+  # AI Services (FastAPI)
+  ai-services:
+    build:
+      context: packages/ai-services
+      dockerfile: Dockerfile
+    container_name: pulsecal-ai-services
+    restart: unless-stopped
+    environment:
+      HOST: 0.0.0.0
+      PORT: 8000
+      DEBUG: "false"
+      CORS_ORIGINS: '["http://web:3000","http://api:3001"]'
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USERNAME: ${DB_USERNAME:-pulsecal}
+      DB_PASSWORD: ${DB_PASSWORD:-CHANGE_ME_IN_PRODUCTION}
+      DB_DATABASE: ${DB_DATABASE:-pulsecal_secureband}
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USER: ${RABBITMQ_USER:-pulsecal}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:-CHANGE_ME_IN_PRODUCTION}
+      RABBITMQ_VHOST: ${RABBITMQ_VHOST:-pulsecal}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - pulsecal-internal
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8000/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    # No ports exposed - internal network only
+
+  # Frontend Web (Next.js)
+  web:
+    build:
+      context: .
+      dockerfile: packages/web/Dockerfile
+    container_name: pulsecal-web
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      NEXT_PUBLIC_API_URL: http://api:3001
+      NEXT_PUBLIC_AI_SERVICES_URL: http://ai-services:8000
+    depends_on:
+      api:
+        condition: service_healthy
+    networks:
+      - pulsecal-internal
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    # No ports exposed - internal network only
+
+  # Nginx Reverse Proxy (LAN access only)
+  nginx:
+    image: nginx:alpine
+    container_name: pulsecal-nginx
+    restart: unless-stopped
+    volumes:
+      - ./deployment/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./deployment/nginx/conf.d:/etc/nginx/conf.d:ro
+    depends_on:
+      - web
+      - api
+    networks:
+      - pulsecal-internal
+      - pulsecal-lan
+    ports:
+      - "${NGINX_HTTP_PORT:-80}:80"
+      - "${NGINX_HTTPS_PORT:-443}:443"
+    # Only expose ports for LAN access (configure firewall separately)
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Backup Service (Scheduled backups)
+  backup:
+    image: postgres:16-alpine
+    container_name: pulsecal-backup
+    restart: unless-stopped
+    environment:
+      PGHOST: postgres
+      PGPORT: 5432
+      PGUSER: ${DB_USERNAME:-pulsecal}
+      PGPASSWORD: ${DB_PASSWORD:-CHANGE_ME_IN_PRODUCTION}
+      PGDATABASE: ${DB_DATABASE:-pulsecal_secureband}
+      BACKUP_SCHEDULE: ${BACKUP_SCHEDULE:-0 2 * * *}
+      BACKUP_RETENTION_DAYS: ${BACKUP_RETENTION_DAYS:-30}
+    volumes:
+      - ./backups:/backups:rw
+      - ./deployment/scripts/backup.sh:/backup.sh:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - pulsecal-internal
+    entrypoint: ["/bin/sh", "/backup.sh"]
+    # No ports exposed - internal network only
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  rabbitmq_data:
+    driver: local
+
+networks:
+  pulsecal-internal:
+    driver: bridge
+    internal: false  # Set to true for air-gap mode
+  pulsecal-lan:
+    driver: bridge
+    # This network allows LAN access through nginx only

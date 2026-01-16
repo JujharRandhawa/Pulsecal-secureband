@@ -1,0 +1,104 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: packages/web/Dockerfile
+    container_name: pulsecal-web
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=http://api:3001
+      - NEXT_PUBLIC_AI_SERVICES_URL=http://ai-services:8000
+    depends_on:
+      - api
+      - ai-services
+    networks:
+      - pulsecal-network
+
+  api:
+    build:
+      context: .
+      dockerfile: packages/api/Dockerfile
+    container_name: pulsecal-api
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - CORS_ORIGIN=http://localhost:3000
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+      - DB_DATABASE=pulsecal
+      - DB_SSL=false
+      - DB_SYNCHRONIZE=false
+      - DB_LOGGING=false
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - pulsecal-network
+
+  postgres:
+    image: timescale/timescaledb:latest-pg16
+    container_name: pulsecal-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=pulsecal
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./database:/docker-entrypoint-initdb.d
+    networks:
+      - pulsecal-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: pulsecal-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - pulsecal-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  ai-services:
+    build:
+      context: packages/ai-services
+      dockerfile: Dockerfile
+    container_name: pulsecal-ai-services
+    ports:
+      - "8000:8000"
+    environment:
+      - HOST=0.0.0.0
+      - PORT=8000
+      - DEBUG=false
+      - CORS_ORIGINS=["http://localhost:3000","http://localhost:3001"]
+    networks:
+      - pulsecal-network
+
+networks:
+  pulsecal-network:
+    driver: bridge
+
+volumes:
+  postgres-data:
+  redis-data:
