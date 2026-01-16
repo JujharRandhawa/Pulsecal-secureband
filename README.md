@@ -2,6 +2,23 @@
 
 A production-grade monorepo for a government wearable monitoring platform.
 
+## 🚀 Quick Start (One-Click Launch)
+
+**For Windows users:** Simply double-click `START.bat` or `START.ps1` to launch the entire application!
+
+The launcher will:
+- ✅ Check and install prerequisites
+- ✅ Install dependencies automatically
+- ✅ Start all services (Web, API, AI Services)
+- ✅ Open the dashboard in your browser
+
+📖 **See [START.md](./START.md) for detailed launcher documentation.**
+
+**Service Ports:**
+- Web Dashboard: http://localhost:3000
+- API Server: http://localhost:3001
+- AI Services: http://localhost:8000
+
 ## 📁 Project Structure
 
 ```
