@@ -1,14 +1,57 @@
-import { Search, Plus } from 'lucide-react';
+'use client';
 
+import { Search, Plus } from 'lucide-react';
+import { useState } from 'react';
+
+import { AddInmateDialog } from '@/components/inmate-management/add-inmate-dialog';
+import { Sidebar } from '@/components/layout/sidebar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
 export default function InmatesPage(): JSX.Element {
+  const [addDialogOpen, setAddDialogOpen] = useState(false);
+
+  const handleAddInmate = async (inmateData: {
+    inmateNumber: string;
+    firstName: string;
+    lastName: string;
+    dateOfBirth?: string;
+    admissionDate?: string;
+    status?: string;
+  }) => {
+    try {
+      // Note: This endpoint may need to be created in the API
+      // For now, we'll use a placeholder endpoint
+      const response = await fetch(`${API_URL}/inmates`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(inmateData),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to add inmate');
+      }
+
+      // Refresh the page or update the list
+      window.location.reload();
+    } catch (error) {
+      console.error('Error adding inmate:', error);
+      throw error;
+    }
+  };
+
   return (
-    <div className="space-y-6">
+    <div className="flex h-screen overflow-hidden bg-gray-50">
+      <Sidebar />
+      <div className="flex flex-1 flex-col overflow-auto p-6">
+        <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Inmates</h1>
@@ -16,7 +59,7 @@ export default function InmatesPage(): JSX.Element {
             Manage inmate profiles and device assignments
           </p>
         </div>
-        <Button>
+        <Button onClick={() => setAddDialogOpen(true)}>
           <Plus className="mr-2 h-4 w-4" />
           Add Inmate
         </Button>
@@ -61,6 +104,14 @@ export default function InmatesPage(): JSX.Element {
           </div>
         </CardContent>
       </Card>
+
+      <AddInmateDialog
+        open={addDialogOpen}
+        onOpenChange={setAddDialogOpen}
+        onAdd={handleAddInmate}
+      />
+        </div>
+      </div>
     </div>
   );
 }

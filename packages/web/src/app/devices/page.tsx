@@ -4,6 +4,7 @@ import { Activity, Battery, Signal, Plus, AlertCircle } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
 import { AddDeviceDialog } from '@/components/device-management/add-device-dialog';
+import { Sidebar } from '@/components/layout/sidebar';
 import { DeviceList } from '@/components/device-management/device-list';
 import { RemoveDeviceDialog } from '@/components/device-management/remove-device-dialog';
 import { Badge } from '@/components/ui/badge';
@@ -160,8 +161,11 @@ export default function DeviceManagementPage(): JSX.Element {
   });
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="flex h-screen overflow-hidden bg-gray-50">
+      <Sidebar />
+      <div className="flex flex-1 flex-col overflow-auto p-6">
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Device Management</h1>
           <p className="text-muted-foreground">
@@ -294,6 +298,8 @@ export default function DeviceManagementPage(): JSX.Element {
           onRemove={handleRemoveDevice}
         />
       )}
+        </div>
+      </div>
     </div>
   );
 }

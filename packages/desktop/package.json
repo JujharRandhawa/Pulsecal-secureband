@@ -106,7 +106,9 @@
         }
       ],
       "icon": "build/icon.ico",
-      "publisherName": "PulseCal"
+      "publisherName": "PulseCal",
+      "sign": null,
+      "verifyUpdateCodeSignature": false
     },
     "linux": {
       "target": [

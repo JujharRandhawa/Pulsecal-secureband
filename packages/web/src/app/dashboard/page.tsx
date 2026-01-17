@@ -4,6 +4,7 @@ import { Activity, AlertTriangle, TrendingUp, FileText } from 'lucide-react';
 import { useState, useEffect, useCallback } from 'react';
 
 import { AlertsPanel } from '@/components/dashboard/alerts-panel';
+import { Sidebar } from '@/components/layout/sidebar';
 import { AuditLogView } from '@/components/dashboard/audit-log-view';
 import { DeviceStatusIndicators } from '@/components/dashboard/device-status-indicators';
 import { HistoricalCharts } from '@/components/dashboard/historical-charts';
@@ -76,7 +77,9 @@ export default function DashboardPage(): JSX.Element {
   }, [fetchStats]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="flex h-screen overflow-hidden bg-gray-50">
+      <Sidebar />
+      <div className="flex flex-1 flex-col overflow-hidden">
       <div className="border-b bg-white">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
@@ -203,6 +206,7 @@ export default function DashboardPage(): JSX.Element {
             <AuditLogView />
           </TabsContent>
         </Tabs>
+      </div>
       </div>
     </div>
   );
