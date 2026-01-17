@@ -10,6 +10,7 @@ export interface SignalQualityRequest {
 }
 
 export interface SignalQualityResponse {
+  model_version?: string;
   device_id: string;
   quality_score: number;
   quality_grade: 'excellent' | 'good' | 'fair' | 'poor';
@@ -51,6 +52,7 @@ export interface AnomalyDetectionResponse {
   anomalies: AnomalyResult[];
   overall_risk_score: number;
   processed_at: string;
+  model_version?: string;
 }
 
 export interface RiskScoringRequest {
@@ -82,6 +84,7 @@ export interface RiskScoringResponse {
   confidence: number;
   assessed_at: string;
   valid_until: string;
+  model_version?: string;
 }
 
 export interface AiServiceError {

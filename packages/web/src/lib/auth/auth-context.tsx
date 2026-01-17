@@ -1,7 +1,8 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
+
 import { authService } from './auth-service';
 import type { Session } from './types';
 
@@ -23,7 +24,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }): JSX.E
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
-  const pathname = usePathname();
+  // Pathname reserved for future use: usePathname()
+
+  const handleLogout = useCallback(async (): Promise<void> => {
+    try {
+      if (session?.token) {
+        await authService.logout(session.token);
+      }
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      authService.clearSession();
+      setSession(null);
+      router.push('/login');
+    }
+  }, [session, router]);
 
   // Load session from storage on mount
   useEffect(() => {
@@ -47,7 +62,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }): JSX.E
       }
     };
 
-    loadSession();
+    void loadSession();
   }, []);
 
   // Handle inactivity timeout
@@ -63,7 +78,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }): JSX.E
     const checkInactivity = (): void => {
       const timeSinceActivity = Date.now() - lastActivity;
       if (timeSinceActivity >= INACTIVITY_TIMEOUT) {
-        handleLogout();
+        void handleLogout();
       }
     };
 
@@ -82,7 +97,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }): JSX.E
       });
       clearInterval(inactivityInterval);
     };
-  }, [session]);
+  }, [session, handleLogout]);
 
   // Check session expiration
   useEffect(() => {
@@ -90,28 +105,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }): JSX.E
 
     const checkExpiration = (): void => {
       if (session.expiresAt && new Date(session.expiresAt) < new Date()) {
-        handleLogout();
+        void handleLogout();
       }
     };
 
     const expirationInterval = setInterval(checkExpiration, 60000); // Check every minute
 
     return () => clearInterval(expirationInterval);
-  }, [session]);
-
-  const handleLogout = useCallback(async (): Promise<void> => {
-    try {
-      if (session?.token) {
-        await authService.logout(session.token);
-      }
-    } catch (error) {
-      console.error('Logout error:', error);
-    } finally {
-      authService.clearSession();
-      setSession(null);
-      router.push('/login');
-    }
-  }, [session, router]);
+  }, [session, handleLogout]);
 
   const login = useCallback(async (jailName: string, password: string): Promise<void> => {
     const newSession = await authService.login(jailName, password);

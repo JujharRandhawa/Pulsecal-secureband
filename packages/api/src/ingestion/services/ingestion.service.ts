@@ -18,6 +18,7 @@ import { DeviceStatus } from '../../entities/device-status.entity';
 import { DeviceLookupService } from './device-lookup.service';
 import { PacketValidatorService, PacketMetadata } from './packet-validator.service';
 import { EventPublisherService } from '../../event-pipeline/services/event-publisher.service';
+import { EventType } from '../../event-pipeline/types/event.types';
 import { RealtimeEmitterService } from '../../realtime/services/realtime-emitter.service';
 import { DeviceBindingService } from '../../device-management/services/device-binding.service';
 import { DeviceStreamingService } from '../../device-management/services/device-streaming.service';
@@ -119,7 +120,8 @@ export class IngestionService {
       // Publish event for alert processing (AI analysis happens separately)
       await this.publishMetricEvent(savedMetric, 'vital', dto.deviceSerial);
     } catch (error) {
-      this.logger.error(`Failed to ingest PPG data: ${error.message}`, error.stack);
+      const err = error instanceof Error ? error : new Error(String(error));
+      this.logger.error(`Failed to ingest PPG data: ${err.message}`, err.stack);
       throw error;
     }
   }
@@ -184,9 +186,10 @@ export class IngestionService {
 
       await this.publishMetricEvent(savedMetric, 'vital', dto.deviceSerial);
     } catch (error) {
+      const err = error instanceof Error ? error : new Error(String(error));
       this.logger.error(
-        `Failed to ingest temperature data: ${error.message}`,
-        error.stack,
+        `Failed to ingest temperature data: ${err.message}`,
+        err.stack,
       );
       throw error;
     }
@@ -244,7 +247,7 @@ export class IngestionService {
 
       await this.publishMetricEvent(savedMetric, 'location', dto.deviceSerial);
     } catch (error) {
-      this.logger.error(`Failed to ingest IMU data: ${error.message}`, error.stack);
+      this.logger.error(`Failed to ingest IMU data: ${(error instanceof Error ? error.message : String(error))}`, (error instanceof Error ? error.stack : undefined));
       throw error;
     }
   }
@@ -319,9 +322,10 @@ export class IngestionService {
 
       await this.publishMetricEvent(savedStatus, 'status', dto.deviceSerial);
     } catch (error) {
+      const err = error instanceof Error ? error : new Error(String(error));
       this.logger.error(
-        `Failed to ingest device status: ${error.message}`,
-        error.stack,
+        `Failed to ingest device status: ${err.message}`,
+        err.stack,
       );
       throw error;
     }
@@ -367,11 +371,11 @@ export class IngestionService {
         }
       } catch (error) {
         results.failed++;
-        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        const errorMessage = error instanceof Error ? (error instanceof Error ? error.message : String(error)) : 'Unknown error';
         results.errors.push(`Failed to ingest metric for ${metric.deviceSerial}: ${errorMessage}`);
         this.logger.error(
           `Batch ingestion error for ${metric.deviceSerial}: ${errorMessage}`,
-          error instanceof Error ? error.stack : undefined,
+          error instanceof Error ? (error instanceof Error ? error.stack : undefined) : undefined,
         );
       }
     }
@@ -421,7 +425,7 @@ export class IngestionService {
 
       // Publish to event pipeline (AI services will consume this separately)
       await this.eventPublisher.publishMetricEvent({
-        type: 'metric.ingested' as const,
+        type: EventType.METRIC_INGESTED,
         metricId: metric.id,
         deviceId: metric.deviceId,
         inmateDeviceId,
@@ -447,7 +451,7 @@ export class IngestionService {
           });
         } catch (error) {
           this.logger.warn(
-            `Failed to emit WebSocket vital metric: ${error instanceof Error ? error.message : 'Unknown error'}`,
+            `Failed to emit WebSocket vital metric: ${error instanceof Error ? (error instanceof Error ? error.message : String(error)) : 'Unknown error'}`,
           );
         }
       } else if (metricType === 'status') {
@@ -461,14 +465,14 @@ export class IngestionService {
           });
         } catch (error) {
           this.logger.warn(
-            `Failed to emit WebSocket device status: ${error instanceof Error ? error.message : 'Unknown error'}`,
+            `Failed to emit WebSocket device status: ${error instanceof Error ? (error instanceof Error ? error.message : String(error)) : 'Unknown error'}`,
           );
         }
       }
     } catch (error) {
       // Log error but don't fail ingestion
       this.logger.warn(
-        `Failed to publish metric event: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        `Failed to publish metric event: ${error instanceof Error ? (error instanceof Error ? error.message : String(error)) : 'Unknown error'}`,
       );
     }
   }
@@ -496,7 +500,7 @@ export class IngestionService {
     } catch (error) {
       // Don't fail ingestion if binding check fails
       this.logger.warn(
-        `Failed to check device binding status: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        `Failed to check device binding status: ${error instanceof Error ? (error instanceof Error ? error.message : String(error)) : 'Unknown error'}`,
       );
     }
   }

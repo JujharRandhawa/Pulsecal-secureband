@@ -18,7 +18,7 @@ class AuthService {
       });
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
+        const errorData = await response.json().catch(() => ({})) as { message?: string };
         
         if (response.status === 401) {
           throw new Error('Invalid jail name or password');
@@ -31,7 +31,7 @@ class AuthService {
         }
       }
 
-      const data: LoginResponse = await response.json();
+      const data = await response.json() as LoginResponse;
       
       const session: Session = {
         token: data.token,
@@ -106,7 +106,7 @@ class AuthService {
       const stored = localStorage.getItem(SESSION_STORAGE_KEY);
       if (!stored) return null;
 
-      const session: Session = JSON.parse(stored);
+      const session = JSON.parse(stored) as Session;
       
       // Check if session is expired
       if (session.expiresAt && new Date(session.expiresAt) < new Date()) {

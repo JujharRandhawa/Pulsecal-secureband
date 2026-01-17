@@ -10,9 +10,9 @@ import {
 import { Device } from './device.entity';
 
 @Entity('alerts')
-@Index(['deviceId', 'triggeredAt'], { order: { triggeredAt: 'DESC' } })
-@Index(['status', 'triggeredAt'], { order: { triggeredAt: 'DESC' } })
-@Index(['severity', 'triggeredAt'], { order: { triggeredAt: 'DESC' } })
+@Index(['deviceId', 'triggeredAt'])
+@Index(['status', 'triggeredAt'])
+@Index(['severity', 'triggeredAt'])
 export class Alert {
   @PrimaryGeneratedColumn('uuid')
   id: string;

@@ -1,9 +1,10 @@
 'use client';
 
 import { Bell, Search } from 'lucide-react';
+
+import { ConnectionStatus } from '@/components/realtime/connection-status';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ConnectionStatus } from '@/components/realtime/connection-status';
 
 export function Header() {
   return (

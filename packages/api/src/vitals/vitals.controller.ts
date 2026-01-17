@@ -84,7 +84,7 @@ export class VitalsController {
     }
 
     const startTime = new Date();
-    startTime.setHours(startTime.getHours() - hours);
+    startTime.setHours(startTime.getHours() - (hours || 24));
 
     const query = this.vitalMetricRepository
       .createQueryBuilder('vm')

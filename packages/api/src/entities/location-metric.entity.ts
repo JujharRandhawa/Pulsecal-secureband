@@ -9,8 +9,8 @@ import {
 import { Device } from './device.entity';
 
 @Entity('location_metrics')
-@Index(['deviceId', 'recordedAt'], { order: { recordedAt: 'DESC' } })
-@Index(['recordedAt'], { order: { recordedAt: 'DESC' } })
+@Index(['deviceId', 'recordedAt'])
+@Index(['recordedAt'])
 export class LocationMetric {
   @PrimaryGeneratedColumn('uuid')
   id: string;

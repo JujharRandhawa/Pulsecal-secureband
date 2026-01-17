@@ -26,7 +26,10 @@ async function bootstrap(): Promise<void> {
   });
 
   // Trust proxy for accurate IP addresses (important for IP restriction)
-  app.set('trust proxy', true);
+  const expressApp = app.getHttpAdapter().getInstance();
+  if (expressApp && typeof expressApp.set === 'function') {
+    expressApp.set('trust proxy', true);
+  }
 
   // Enable WebSocket adapter
   app.useWebSocketAdapter(new IoAdapter(app));

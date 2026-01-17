@@ -14,7 +14,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Device } from '../../entities/device.entity';
 import { DeviceStatus } from '../../entities/device-status.entity';
-import { Alert, AlertSeverity, AlertStatus, AlertType } from '../../entities/alert.entity';
+import { Alert } from '../../entities/alert.entity';
 import { DeviceStreamingService } from './device-streaming.service';
 import { RealtimeEmitterService } from '../../realtime/services/realtime-emitter.service';
 
@@ -340,12 +340,12 @@ export class DeviceHealthMonitor implements OnModuleDestroy {
     try {
       const alert = this.alertRepository.create({
         deviceId,
-        alertType: AlertType.DEVICE_OFFLINE,
-        severity: AlertSeverity.WARNING,
-        status: AlertStatus.OPEN,
+        alertType: 'device_offline',
+        severity: 'warning',
+        status: 'open',
         description: `Device ${device?.serialNumber || deviceId} has gone offline. Last seen: ${monitored.lastSeenAt.toISOString()}`,
         triggeredAt: new Date(),
-        metadata: {
+        alertData: {
           lastSeenAt: monitored.lastSeenAt.toISOString(),
           jailId: monitored.jailId,
           deviceSerial: device?.serialNumber || null,
@@ -360,9 +360,9 @@ export class DeviceHealthMonitor implements OnModuleDestroy {
         alertId: savedAlert.id,
         deviceId,
         inmateDeviceId: null,
-        alertType: AlertType.DEVICE_OFFLINE,
-        severity: AlertSeverity.WARNING,
-        status: AlertStatus.OPEN,
+        alertType: 'device_offline',
+        severity: 'warning',
+        status: 'open',
         description: alert.description,
         triggeredAt: savedAlert.triggeredAt.toISOString(),
       });
@@ -382,9 +382,9 @@ export class DeviceHealthMonitor implements OnModuleDestroy {
       await this.alertRepository.update(
         { id: alertId },
         {
-          status: AlertStatus.RESOLVED,
+          status: 'resolved',
           resolvedAt: new Date(),
-          resolutionNote: 'Device reconnected',
+          resolutionNotes: 'Device reconnected',
         },
       );
     } catch (error) {

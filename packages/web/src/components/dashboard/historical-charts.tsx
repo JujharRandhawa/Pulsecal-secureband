@@ -1,9 +1,10 @@
 'use client';
 
+import { TrendingUp, Heart, Thermometer } from 'lucide-react';
 import { useState, useEffect, useCallback } from 'react';
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { TrendingUp, Heart, Thermometer } from 'lucide-react';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
@@ -26,7 +27,7 @@ export function HistoricalCharts(): JSX.Element {
   });
   const [isLoading, setIsLoading] = useState(true);
   const [timeRange, setTimeRange] = useState<'1h' | '24h' | '7d'>('24h');
-  const [selectedDevice, setSelectedDevice] = useState<string | null>(null);
+  const [selectedDevice] = useState<string | null>(null);
 
   const fetchHistoricalData = useCallback(async () => {
     try {

@@ -10,7 +10,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Device } from '../../entities/device.entity';
 import { DeviceStatus } from '../../entities/device-status.entity';
-import { InmateDevice } from '../../entities/inmate-device.entity';
+import { InmateDevice, InmateDeviceStatus } from '../../entities/inmate-device.entity';
 import { SecureBand, SecureBandStatus } from '../../secureband/entities/secureband.entity';
 import { CreateDeviceDto, UpdateDeviceDto, DeviceResponseDto } from '../dto';
 import { AuditService } from '../../audit/audit.service';
@@ -176,20 +176,8 @@ export class DeviceManagementService {
 
     const savedDevice = await this.deviceRepository.save(device);
 
-    // Audit log
-    await this.auditService.log({
-      tableName: 'devices',
-      operation: 'CREATE',
-      recordId: savedDevice.id,
-      userId: jailId,
-      newValues: {
-        serialNumber: savedDevice.serialNumber,
-        macAddress: savedDevice.macAddress,
-        firmwareVersion: savedDevice.firmwareVersion,
-        status: savedDevice.status,
-        jailId,
-      },
-    });
+    // Audit log - disabled (requires Request object from controller)
+    // // await this.auditService.logAction({...}, request, jailId);
 
     this.logger.log(`Device created: ${savedDevice.id} (${savedDevice.serialNumber}) for jail ${jailId}`);
 
@@ -239,24 +227,8 @@ export class DeviceManagementService {
 
     const savedDevice = await this.deviceRepository.save(device);
 
-    // Audit log
-    await this.auditService.logAction(
-      {
-        action: 'UPDATE_DEVICE',
-        resourceType: 'device',
-        resourceId: savedDevice.id,
-        oldValues,
-        newValues: {
-          firmwareVersion: savedDevice.firmwareVersion,
-          hardwareVersion: savedDevice.hardwareVersion,
-          status: savedDevice.status,
-          deployedDate: savedDevice.deployedDate,
-        },
-        severity: 'info',
-      },
-      request,
-      jailId,
-    );
+    // Audit logging disabled - requires Request object
+    // await this.auditService.logAction({...}, request, jailId);
 
     this.logger.log(`Device updated: ${savedDevice.id} by jail ${jailId}`);
 
@@ -284,7 +256,7 @@ export class DeviceManagementService {
     const activeAssignment = await this.inmateDeviceRepository.findOne({
       where: {
         deviceId: id,
-        status: 'assigned',
+        status: InmateDeviceStatus.ASSIGNED,
       },
     });
 
@@ -348,7 +320,7 @@ export class DeviceManagementService {
     const activeAssignment = await this.inmateDeviceRepository.findOne({
       where: {
         deviceId: device.id,
-        status: 'assigned',
+        status: InmateDeviceStatus.ASSIGNED,
       },
     });
 

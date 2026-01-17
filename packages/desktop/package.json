@@ -1,0 +1,127 @@
+{
+  "name": "@pulsecal/desktop",
+  "version": "1.0.0",
+  "description": "PulseCal SecureBand Desktop Application",
+  "main": "dist/main.js",
+  "author": "PulseCal",
+  "license": "PROPRIETARY",
+  "private": true,
+  "scripts": {
+    "dev": "tsc && node build-preload.js && electron .",
+    "build": "tsc && node build-preload.js",
+    "build:web": "cd ../web && cross-env ELECTRON_BUILD=true pnpm build",
+    "build:api": "cd ../api && pnpm build",
+    "build:shared": "cd ../shared && pnpm build",
+    "build:all": "pnpm build:shared && pnpm build:api && pnpm build:web && pnpm build",
+    "generate:icons": "node scripts/generate-icon.js",
+    "package": "electron-builder",
+    "package:win": "electron-builder --win",
+    "package:linux": "electron-builder --linux",
+    "package:all": "electron-builder --win --linux",
+    "lint": "eslint src --ext .ts",
+    "clean": "rm -rf dist out"
+  },
+  "dependencies": {
+    "cross-spawn": "^7.0.3",
+    "electron-updater": "^6.1.7",
+    "tree-kill": "^1.2.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.5",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/parser": "^6.21.0",
+    "cross-env": "^10.1.0",
+    "electron": "^28.1.0",
+    "electron-builder": "^24.9.1",
+    "eslint": "^8.56.0",
+    "sharp": "^0.33.5",
+    "typescript": "^5.3.3"
+  },
+  "build": {
+    "appId": "com.pulsecal.secureband",
+    "productName": "PulseCal SecureBand",
+    "directories": {
+      "output": "out",
+      "buildResources": "build"
+    },
+    "files": [
+      "dist/**/*",
+      "build/**/*",
+      "../web/.next/**/*",
+      "../web/public/**/*",
+      "../web/node_modules/**/*",
+      "../web/package.json",
+      "../web/next.config.js",
+      "../api/dist/**/*",
+      "../api/package.json",
+      "../api/node_modules/**/*",
+      "../shared/dist/**/*",
+      "../ai-services/**/*",
+      "!../ai-services/**/__pycache__",
+      "!../ai-services/**/*.pyc",
+      "!../ai-services/venv",
+      "!../ai-services/.venv"
+    ],
+    "extraResources": [
+      {
+        "from": "../api/dist",
+        "to": "api",
+        "filter": [
+          "**/*"
+        ]
+      },
+      {
+        "from": "../ai-services",
+        "to": "ai-services",
+        "filter": [
+          "**/*",
+          "!venv",
+          "!.venv",
+          "!__pycache__",
+          "!*.pyc"
+        ]
+      },
+      {
+        "from": "../web/.next",
+        "to": "web/.next",
+        "filter": [
+          "**/*"
+        ]
+      },
+      {
+        "from": "../web/public",
+        "to": "web/public",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/icon.ico",
+      "publisherName": "PulseCal"
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "icon": "build/icon.png",
+      "category": "Utility"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "PulseCal SecureBand"
+    }
+  }
+}

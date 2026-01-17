@@ -1,4 +1,4 @@
-import { IsString, IsNumber, IsDateString, IsOptional, IsObject } from 'class-validator';
+import { IsString, IsNumber, IsDateString, IsOptional, IsObject, Min } from 'class-validator';
 
 export class ImuDataDto {
   @IsString()

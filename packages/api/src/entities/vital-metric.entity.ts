@@ -9,8 +9,8 @@ import {
 import { Device } from './device.entity';
 
 @Entity('vital_metrics')
-@Index(['deviceId', 'recordedAt'], { order: { recordedAt: 'DESC' } })
-@Index(['recordedAt'], { order: { recordedAt: 'DESC' } })
+@Index(['deviceId', 'recordedAt'])
+@Index(['recordedAt'])
 export class VitalMetric {
   @PrimaryGeneratedColumn('uuid')
   id: string;

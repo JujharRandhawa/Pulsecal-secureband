@@ -1,9 +1,13 @@
 'use client';
 
-import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
+import { useState, FormEvent } from 'react';
+
 import { useAuth } from '@/lib/auth/auth-context';
+
 import styles from './login.module.css';
+
+export const dynamic = 'force-dynamic';
 
 export default function LoginPage(): JSX.Element {
   const [jailName, setJailName] = useState('');

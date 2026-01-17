@@ -1,5 +1,6 @@
 'use client';
 
+import { Heart, Thermometer, Droplets } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import {
   LineChart,
@@ -11,9 +12,9 @@ import {
   Legend,
   ResponsiveContainer,
 } from 'recharts';
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useWebSocket, VitalMetricEvent } from '@/hooks/use-websocket';
-import { Heart, Thermometer, Droplets } from 'lucide-react';
 
 interface VitalChartProps {
   deviceId?: string;

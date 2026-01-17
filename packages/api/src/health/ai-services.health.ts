@@ -38,11 +38,12 @@ export class AiServicesHealthIndicator extends HealthIndicator {
       }
 
       const data = await response.json();
-      const responseTime = Date.now() - (data.timestamp ? new Date(data.timestamp).getTime() : Date.now());
+      const responseData = data as { timestamp?: string; status?: string };
+      const responseTime = Date.now() - (responseData.timestamp ? new Date(responseData.timestamp).getTime() : Date.now());
 
       return this.getStatus(key, true, {
         url: baseUrl,
-        status: data.status || 'ok',
+        status: responseData.status || 'ok',
         responseTime: `${Math.abs(responseTime)}ms`,
       });
     } catch (error) {

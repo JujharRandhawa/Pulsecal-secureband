@@ -44,7 +44,7 @@ export class IngestionController {
     try {
       // Process asynchronously
       this.ingestionService.ingestPpgData(dto).catch((error) => {
-        this.logger.error(`Async PPG ingestion failed: ${error.message}`, error.stack);
+        this.logger.error(`Async PPG ingestion failed: ${(error instanceof Error ? error.message : String(error))}`, (error instanceof Error ? error.stack : undefined));
       });
 
       return {
@@ -52,8 +52,9 @@ export class IngestionController {
         message: 'PPG data ingestion initiated',
       };
     } catch (error) {
-      this.logger.error(`PPG ingestion error: ${error.message}`, error.stack);
-      throw new BadRequestException(`Failed to process PPG data: ${error.message}`);
+      const err = error instanceof Error ? error : new Error(String(error));
+      this.logger.error(`PPG ingestion error: ${err.message}`, err.stack);
+      throw new BadRequestException(`Failed to process PPG data: ${err.message}`);
     }
   }
 
@@ -66,8 +67,8 @@ export class IngestionController {
       // Process asynchronously
       this.ingestionService.ingestTemperatureData(dto).catch((error) => {
         this.logger.error(
-          `Async temperature ingestion failed: ${error.message}`,
-          error.stack,
+          `Async temperature ingestion failed: ${(error instanceof Error ? error.message : String(error))}`,
+          (error instanceof Error ? error.stack : undefined),
         );
       });
 
@@ -76,9 +77,10 @@ export class IngestionController {
         message: 'Temperature data ingestion initiated',
       };
     } catch (error) {
-      this.logger.error(`Temperature ingestion error: ${error.message}`, error.stack);
+      const err = error instanceof Error ? error : new Error(String(error));
+      this.logger.error(`Temperature ingestion error: ${err.message}`, err.stack);
       throw new BadRequestException(
-        `Failed to process temperature data: ${error.message}`,
+        `Failed to process temperature data: ${err.message}`,
       );
     }
   }
@@ -89,7 +91,7 @@ export class IngestionController {
     try {
       // Process asynchronously
       this.ingestionService.ingestImuData(dto).catch((error) => {
-        this.logger.error(`Async IMU ingestion failed: ${error.message}`, error.stack);
+        this.logger.error(`Async IMU ingestion failed: ${(error instanceof Error ? error.message : String(error))}`, (error instanceof Error ? error.stack : undefined));
       });
 
       return {
@@ -97,8 +99,9 @@ export class IngestionController {
         message: 'IMU data ingestion initiated',
       };
     } catch (error) {
-      this.logger.error(`IMU ingestion error: ${error.message}`, error.stack);
-      throw new BadRequestException(`Failed to process IMU data: ${error.message}`);
+      const err = error instanceof Error ? error : new Error(String(error));
+      this.logger.error(`IMU ingestion error: ${err.message}`, err.stack);
+      throw new BadRequestException(`Failed to process IMU data: ${err.message}`);
     }
   }
 
@@ -111,8 +114,8 @@ export class IngestionController {
       // Process asynchronously
       this.ingestionService.ingestDeviceStatus(dto).catch((error) => {
         this.logger.error(
-          `Async device status ingestion failed: ${error.message}`,
-          error.stack,
+          `Async device status ingestion failed: ${(error instanceof Error ? error.message : String(error))}`,
+          (error instanceof Error ? error.stack : undefined),
         );
       });
 
@@ -121,9 +124,10 @@ export class IngestionController {
         message: 'Device status ingestion initiated',
       };
     } catch (error) {
-      this.logger.error(`Device status ingestion error: ${error.message}`, error.stack);
+      const err = error instanceof Error ? error : new Error(String(error));
+      this.logger.error(`Device status ingestion error: ${err.message}`, err.stack);
       throw new BadRequestException(
-        `Failed to process device status: ${error.message}`,
+        `Failed to process device status: ${err.message}`,
       );
     }
   }
@@ -142,10 +146,10 @@ export class IngestionController {
 
       // Process batch asynchronously
       this.ingestionService.ingestBatch(dto.metrics).catch((error) => {
-        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        const errorMessage = error instanceof Error ? (error instanceof Error ? error.message : String(error)) : 'Unknown error';
         this.logger.error(
           `Async batch ingestion failed: ${errorMessage}`,
-          error instanceof Error ? error.stack : undefined,
+          error instanceof Error ? (error instanceof Error ? error.stack : undefined) : undefined,
         );
       });
 
@@ -155,10 +159,10 @@ export class IngestionController {
         queued,
       };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const errorMessage = error instanceof Error ? (error instanceof Error ? error.message : String(error)) : 'Unknown error';
       this.logger.error(
         `Batch ingestion error: ${errorMessage}`,
-        error instanceof Error ? error.stack : undefined,
+        error instanceof Error ? (error instanceof Error ? error.stack : undefined) : undefined,
       );
       throw new BadRequestException(`Failed to process batch: ${errorMessage}`);
     }

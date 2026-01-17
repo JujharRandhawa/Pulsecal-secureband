@@ -1,6 +1,7 @@
 'use client';
 
 import { Wifi, WifiOff } from 'lucide-react';
+
 import { Badge } from '@/components/ui/badge';
 import { useWebSocket } from '@/hooks/use-websocket';
 

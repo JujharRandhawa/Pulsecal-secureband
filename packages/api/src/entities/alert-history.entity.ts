@@ -10,7 +10,7 @@ import {
 import { Alert } from './alert.entity';
 
 @Entity('alert_history')
-@Index(['alertId', 'createdAt'], { order: { createdAt: 'DESC' } })
+@Index(['alertId', 'createdAt'])
 export class AlertHistory {
   @PrimaryGeneratedColumn('uuid')
   id: string;

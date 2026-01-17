@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException, TooManyRequestsException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
 import * as argon2 from 'argon2';
@@ -181,8 +181,9 @@ export class AuthService {
       .getCount();
 
     if (attemptCount >= this.MAX_LOGIN_ATTEMPTS) {
-      throw new TooManyRequestsException(
+      throw new HttpException(
         'Too many login attempts. Please try again later.',
+        HttpStatus.TOO_MANY_REQUESTS,
       );
     }
   }

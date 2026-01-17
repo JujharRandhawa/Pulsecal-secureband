@@ -1,15 +1,16 @@
 'use client';
 
+import { Activity, AlertTriangle, TrendingUp, FileText } from 'lucide-react';
 import { useState, useEffect, useCallback } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
-import { DeviceStatusIndicators } from '@/components/dashboard/device-status-indicators';
-import { RealtimeVitalsView } from '@/components/dashboard/realtime-vitals-view';
-import { HistoricalCharts } from '@/components/dashboard/historical-charts';
+
 import { AlertsPanel } from '@/components/dashboard/alerts-panel';
 import { AuditLogView } from '@/components/dashboard/audit-log-view';
-import { Activity, AlertTriangle, TrendingUp, FileText } from 'lucide-react';
+import { DeviceStatusIndicators } from '@/components/dashboard/device-status-indicators';
+import { HistoricalCharts } from '@/components/dashboard/historical-charts';
+import { RealtimeVitalsView } from '@/components/dashboard/realtime-vitals-view';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
@@ -40,7 +41,7 @@ export default function DashboardPage(): JSX.Element {
       ]);
 
       if (devicesRes.ok) {
-        const devicesData = await devicesRes.json();
+        const devicesData = await devicesRes.json() as { total?: number; active?: number; offline?: number };
         setStats((prev) => ({
           ...prev,
           totalDevices: devicesData.total || 0,
@@ -50,12 +51,12 @@ export default function DashboardPage(): JSX.Element {
       }
 
       if (alertsRes.ok) {
-        const alertsData = await alertsRes.json();
+        const alertsData = await alertsRes.json() as { alerts?: Array<{ severity: string }> } | Array<{ severity: string }>;
         const alerts = Array.isArray(alertsData) ? alertsData : alertsData.alerts || [];
         setStats((prev) => ({
           ...prev,
           openAlerts: alerts.length,
-          criticalAlerts: alerts.filter((a: any) => a.severity === 'critical').length,
+          criticalAlerts: alerts.filter((a) => a.severity === 'critical').length,
         }));
       }
     } catch (error) {
@@ -66,9 +67,11 @@ export default function DashboardPage(): JSX.Element {
   }, []);
 
   useEffect(() => {
-    fetchStats();
+    void fetchStats();
     // Refresh stats every 30 seconds
-    const interval = setInterval(fetchStats, 30000);
+    const interval = setInterval(() => {
+      void fetchStats();
+    }, 30000);
     return () => clearInterval(interval);
   }, [fetchStats]);
 

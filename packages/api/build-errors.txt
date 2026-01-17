@@ -1,0 +1,126 @@
+﻿
+> @pulsecal/api@1.0.0 build C:\Users\Lenovo\Desktop\PulseCal ai models\making\packages\api
+> nest build
+
+node.exe : [96msrc/device-management/services/device-management.service.ts[0m:[93m233[0m:[93m17[0m - 
+[91merror[0m[90m TS2695: [0mLeft side of comma operator is unused and has no side effects.
+At C:\Users\Lenovo\AppData\Roaming\npm\pnpm.ps1:24 char:5
++     & "node$exe"  "$basedir/node_modules/pnpm/bin/pnpm.cjs" $args
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([96msrc/device...o side effects.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+[7m233[0m         action: 'UPDATE_DEVICE',
+[7m   [0m [91m                ~~~~~~~~~~~~~~~[0m
+[96msrc/device-management/services/device-management.service.ts[0m:[93m234[0m:[93m9[0m - [91merror[0m[90m 
+TS2304: [0mCannot find name 'resourceType'.
+
+[7m234[0m         resourceType: 'device',
+[7m   [0m [91m        ~~~~~~~~~~~~[0m
+[96msrc/device-management/services/device-management.service.ts[0m:[93m234[0m:[93m21[0m - [91merror[0m[90m 
+TS1005: [0m';' expected.
+
+[7m234[0m         resourceType: 'device',
+[7m   [0m [91m                    ~[0m
+[96msrc/device-management/services/device-management.service.ts[0m:[93m234[0m:[93m23[0m - [91merror[0m[90m 
+TS2695: [0mLeft side of comma operator is unused and has no side effects.
+
+[7m234[0m         resourceType: 'device',
+[7m   [0m [91m                      ~~~~~~~~[0m
+[96msrc/device-management/services/device-management.service.ts[0m:[93m235[0m:[93m9[0m - [91merror[0m[90m 
+TS2304: [0mCannot find name 'resourceId'.
+
+[7m235[0m         resourceId: savedDevice.id,
+[7m   [0m [91m        ~~~~~~~~~~[0m
+[96msrc/device-management/services/device-management.service.ts[0m:[93m235[0m:[93m19[0m - [91merror[0m[90m 
+TS1005: [0m';' expected.
+
+[7m235[0m         resourceId: savedDevice.id,
+[7m   [0m [91m                  ~[0m
+[96msrc/device-management/services/device-management.service.ts[0m:[93m237[0m:[93m9[0m - [91merror[0m[90m 
+TS2304: [0mCannot find name 'newValues'.
+
+[7m237[0m         newValues: {
+[7m   [0m [91m        ~~~~~~~~~[0m
+[96msrc/device-management/services/device-management.service.ts[0m:[93m237[0m:[93m18[0m - [91merror[0m[90m 
+TS1005: [0m';' expected.
+
+[7m237[0m         newValues: {
+[7m   [0m [91m                 ~[0m
+[96msrc/device-management/services/device-management.service.ts[0m:[93m239[0m:[93m11[0m - [91merror[0m[90m 
+TS2304: [0mCannot find name 'hardwareVersion'.
+
+[7m239[0m           hardwareVersion: savedDevice.hardwareVersion,
+[7m   [0m [91m          ~~~~~~~~~~~~~~~[0m
+[96msrc/device-management/services/device-management.service.ts[0m:[93m239[0m:[93m26[0m - [91merror[0m[90m 
+TS1005: [0m';' expected.
+
+[7m239[0m           hardwareVersion: savedDevice.hardwareVersion,
+[7m   [0m [91m                         ~[0m
+[96msrc/device-management/services/device-management.service.ts[0m:[93m240[0m:[93m11[0m - [91merror[0m[90m 
+TS2304: [0mCannot find name 'status'.
+
+[7m240[0m           status: savedDevice.status,
+[7m   [0m [91m          ~~~~~~[0m
+[96msrc/device-management/services/device-management.service.ts[0m:[93m240[0m:[93m17[0m - [91merror[0m[90m 
+TS1005: [0m';' expected.
+
+[7m240[0m           status: savedDevice.status,
+[7m   [0m [91m                ~[0m
+[96msrc/device-management/services/device-management.service.ts[0m:[93m241[0m:[93m11[0m - [91merror[0m[90m 
+TS2304: [0mCannot find name 'deployedDate'.
+
+[7m241[0m           deployedDate: savedDevice.deployedDate,
+[7m   [0m [91m          ~~~~~~~~~~~~[0m
+[96msrc/device-management/services/device-management.service.ts[0m:[93m241[0m:[93m23[0m - [91merror[0m[90m 
+TS1005: [0m';' expected.
+
+[7m241[0m           deployedDate: savedDevice.deployedDate,
+[7m   [0m [91m                      ~[0m
+[96msrc/device-management/services/device-management.service.ts[0m:[93m242[0m:[93m9[0m - [91merror[0m[90m 
+TS1109: [0mExpression expected.
+
+[7m242[0m         },
+[7m   [0m [91m        ~[0m
+[96msrc/device-management/services/device-management.service.ts[0m:[93m242[0m:[93m10[0m - [91merror[0m[90m 
+TS1128: [0mDeclaration or statement expected.
+
+[7m242[0m         },
+[7m   [0m [91m         ~[0m
+[96msrc/device-management/services/device-management.service.ts[0m:[93m243[0m:[93m19[0m - [91merror[0m[90m 
+TS2695: [0mLeft side of comma operator is unused and has no side effects.
+
+[7m243[0m         severity: 'info',
+[7m   [0m [91m                  ~~~~~~[0m
+[96msrc/device-management/services/device-management.service.ts[0m:[93m244[0m:[93m7[0m - [91merror[0m[90m 
+TS1109: [0mExpression expected.
+
+[7m244[0m       },
+[7m   [0m [91m      ~[0m
+[96msrc/device-management/services/device-management.service.ts[0m:[93m244[0m:[93m8[0m - [91merror[0m[90m 
+TS1128: [0mDeclaration or statement expected.
+
+[7m244[0m       },
+[7m   [0m [91m       ~[0m
+[96msrc/device-management/services/device-management.service.ts[0m:[93m245[0m:[93m7[0m - [91merror[0m[90m 
+TS2695: [0mLeft side of comma operator is unused and has no side effects.
+
+[7m245[0m       request,
+[7m   [0m [91m      ~~~~~~~[0m
+[96msrc/device-management/services/device-management.service.ts[0m:[93m245[0m:[93m7[0m - [91merror[0m[90m 
+TS2695: [0mLeft side of comma operator is unused and has no side effects.
+
+[7m245[0m       request,
+[7m   [0m [91m      ~~~~~~~~[0m
+[7m246[0m       jailId,
+[7m   [0m [91m~~~~~~~~~~~~[0m
+[96msrc/device-management/services/device-management.service.ts[0m:[93m247[0m:[93m5[0m - [91merror[0m[90m 
+TS1109: [0mExpression expected.
+
+[7m247[0m     );
+[7m   [0m [91m    ~[0m
+
+Found 22 error(s).
+
+ΓÇëELIFECYCLEΓÇë Command failed with exit code 1.

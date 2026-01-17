@@ -1,8 +1,9 @@
 'use client';
 
+import { LayoutDashboard, Users, Activity, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Users, Activity, AlertCircle } from 'lucide-react';
+
 import { cn } from '@/lib/utils';
 
 const navigation = [

@@ -11,7 +11,7 @@
 
 import { Injectable, Logger, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, LessThan, MoreThan } from 'typeorm';
+import { Repository, LessThan, MoreThan, Between } from 'typeorm';
 import { PacketSequence, PacketStatus } from '../../entities/packet-sequence.entity';
 import { Device } from '../../entities/device.entity';
 
@@ -178,6 +178,11 @@ export class PacketValidatorService {
       this.deviceSequences.set(deviceId, deviceSeq);
     }
 
+    // Skip sequence validation if sequenceNumber is not provided
+    if (sequenceNumber === undefined) {
+      return;
+    }
+
     // Check for duplicate
     if (deviceSeq.receivedSequences.has(sequenceNumber)) {
       result.sequenceStatus = PacketStatus.DUPLICATE;
@@ -205,7 +210,7 @@ export class PacketValidatorService {
       const gap = sequenceNumber - deviceSeq.lastSequence - 1;
       result.sequenceStatus = PacketStatus.MISSING;
       result.missingSequences = [];
-      
+
       for (let i = deviceSeq.lastSequence + 1; i < sequenceNumber; i++) {
         result.missingSequences.push(i);
       }
@@ -406,8 +411,7 @@ export class PacketValidatorService {
       where: {
         deviceId,
         status: PacketStatus.MISSING,
-        recordedAt: MoreThan(startTime),
-        recordedAt: LessThan(endTime),
+        recordedAt: Between(startTime, endTime),
       },
       order: { sequenceNumber: 'ASC' },
     });
@@ -416,8 +420,7 @@ export class PacketValidatorService {
       where: {
         deviceId,
         status: PacketStatus.DELAYED,
-        recordedAt: MoreThan(startTime),
-        recordedAt: LessThan(endTime),
+        recordedAt: Between(startTime, endTime),
       },
     });
 
@@ -425,8 +428,7 @@ export class PacketValidatorService {
       where: {
         deviceId,
         status: PacketStatus.DUPLICATE,
-        recordedAt: MoreThan(startTime),
-        recordedAt: LessThan(endTime),
+        recordedAt: Between(startTime, endTime),
       },
     });
 

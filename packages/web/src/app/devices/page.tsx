@@ -1,14 +1,15 @@
 'use client';
 
+import { Activity, Battery, Signal, Plus, AlertCircle } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+
+import { AddDeviceDialog } from '@/components/device-management/add-device-dialog';
+import { DeviceList } from '@/components/device-management/device-list';
+import { RemoveDeviceDialog } from '@/components/device-management/remove-device-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Activity, Battery, Signal, Plus, AlertCircle } from 'lucide-react';
-import { DeviceList } from '@/components/device-management/device-list';
-import { AddDeviceDialog } from '@/components/device-management/add-device-dialog';
-import { RemoveDeviceDialog } from '@/components/device-management/remove-device-dialog';
 
 interface Device {
   id: string;

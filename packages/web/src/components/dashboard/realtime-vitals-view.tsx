@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Heart, Thermometer, Droplet, Activity } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
@@ -21,7 +22,7 @@ interface VitalMetric {
 export function RealtimeVitalsView(): JSX.Element {
   const [vitals, setVitals] = useState<VitalMetric[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedDevice, setSelectedDevice] = useState<string | null>(null);
+  const [selectedDevice] = useState<string | null>(null);
 
   const fetchVitals = useCallback(async () => {
     try {

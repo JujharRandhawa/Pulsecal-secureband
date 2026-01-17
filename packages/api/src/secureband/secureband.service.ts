@@ -84,9 +84,9 @@ export class SecureBandService {
       secureBand.tokenIssuedAt = new Date();
       secureBand.tokenExpiresAt = tokenExpiresAt;
       secureBand.nonceSeed = nonceSeed;
-      secureBand.removedBy = null;
-      secureBand.removedAt = null;
-      secureBand.removalReason = null;
+      secureBand.removedBy = undefined;
+      secureBand.removedAt = undefined;
+      secureBand.removalReason = undefined;
     } else {
       secureBand = this.secureBandRepository.create({
         deviceUid,
@@ -166,7 +166,7 @@ export class SecureBandService {
     secureBand.removedBy = removedBy;
     secureBand.removedAt = new Date();
     secureBand.removalReason = dto.reason;
-    secureBand.authTokenHash = null; // Invalidate token
+    secureBand.authTokenHash = undefined; // Invalidate token
     secureBand.tokenExpiresAt = new Date(); // Expire immediately
 
     await this.secureBandRepository.save(secureBand);
@@ -313,7 +313,7 @@ export class SecureBandService {
   private validateNonce(nonce: string, seed: string): boolean {
     // In production, implement proper nonce validation with timestamp checking
     // For now, basic validation
-    return nonce && seed && nonce.length > 0;
+    return !!(nonce && seed && nonce.length > 0);
   }
 
   /**

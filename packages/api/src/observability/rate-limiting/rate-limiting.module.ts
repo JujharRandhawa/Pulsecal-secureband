@@ -11,8 +11,10 @@ import { ConfigService } from '../../config/config.service';
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
         return {
-          ttl: parseInt(process.env.RATE_LIMIT_TTL || '60', 10), // 60 seconds
-          limit: parseInt(process.env.RATE_LIMIT_MAX || '100', 10), // 100 requests per window
+          throttlers: [{
+            ttl: parseInt(process.env.RATE_LIMIT_TTL || '60', 10), // 60 seconds
+            limit: parseInt(process.env.RATE_LIMIT_MAX || '100', 10), // 100 requests per window
+          }],
           storage: undefined, // Use in-memory storage (can be extended with Redis)
         };
       },

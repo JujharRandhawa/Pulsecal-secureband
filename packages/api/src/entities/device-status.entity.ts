@@ -9,8 +9,8 @@ import {
 import { Device } from './device.entity';
 
 @Entity('device_status')
-@Index(['deviceId', 'recordedAt'], { order: { recordedAt: 'DESC' } })
-@Index(['recordedAt'], { order: { recordedAt: 'DESC' } })
+@Index(['deviceId', 'recordedAt'])
+@Index(['recordedAt'])
 export class DeviceStatus {
   @PrimaryGeneratedColumn('uuid')
   id: string;
